@@ -100,7 +100,7 @@ func TestReadyHandler(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/ready", nil)
 	w := httptest.NewRecorder()
 
-	readyHandler(context.Background(), kubeClient, "default", w, req)
+	readyHandler(kubeClient, "default", w, req)
 
 	require.Equal(t, http.StatusOK, w.Code)
 	require.Equal(t, "Ready", w.Body.String())
@@ -136,7 +136,7 @@ func TestReadyHandler_StopsWhenRequestIsCancelled(t *testing.T) {
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		readyHandler(context.Background(), kubeClient, "default", w, req)
+		readyHandler(kubeClient, "default", w, req)
 	}()
 
 	select {
