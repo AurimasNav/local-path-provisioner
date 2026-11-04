@@ -3,19 +3,5 @@ set -e
 
 cd $(dirname $0)/..
 
-echo Review: kubelet-like probe tests with timings
-go test -tags=test -count=1 -v -run 'TestReview' .
-
-echo Review: stress the PR tests, GOMAXPROCS=1 and default
-GOMAXPROCS=1 go test -tags=test -count=100 -run 'TestReadyHandler' .
-go test -tags=test -count=100 -run 'TestReadyHandler' .
-
-echo Review: race detector
-if CGO_ENABLED=1 go test -race -tags=test -count=20 -run 'TestReadyHandler|TestHealthHandler' . ; then
-    echo "race run passed"
-else
-    echo "race run FAILED or unsupported (see output above)"
-fi
-
 echo Running tests
 go test -cover -tags=test ./...

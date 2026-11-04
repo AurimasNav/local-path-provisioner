@@ -348,6 +348,9 @@ func runTest(p *PodTestSuite, images []string, waitCondition, volumeType string)
 		fmt.Sprintf("kustomize edit add label %s:%s -f", LabelKey, LabelValue),
 		"kustomize build | kubectl apply -f -",
 		fmt.Sprintf("kubectl wait pod -l %s=%s --for condition=%s --timeout=120s", LabelKey, LabelValue, waitCondition),
+		// review-only: the provisioner pod must become Ready under the new readiness probe
+		"kubectl -n local-path-storage wait pod -l app=local-path-provisioner --for condition=ready --timeout=120s",
+		"kubectl -n local-path-storage get pod -l app=local-path-provisioner -o jsonpath='REVIEW probe={.items[0].spec.containers[0].readinessProbe} ready={.items[0].status.conditions[?(@.type==\"Ready\")].status} restarts={.items[0].status.containerStatuses[0].restartCount}'",
 	)
 
 	for _, cmd := range cmds {
